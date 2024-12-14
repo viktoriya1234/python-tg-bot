@@ -6,7 +6,7 @@ from telebot import types
 from flask import Flask
 
 
-token = '7673939553:AAEVET8kWs7QFanPR8YiZVHHQFuZNjdEjYo'
+token = '7673939553:AAEET8kWs7QFanPR8YiZVHHQFuZNjdEjYo'
 bot = telebot.TeleBot(token)
 
 sticker_list = ['CAACAgQAAxkBAANeZ1QqAAHiylroWe3mNKiD5i_bNo4TAAJyDgACPLQZUMeeP4x6Lf6LNgQ',

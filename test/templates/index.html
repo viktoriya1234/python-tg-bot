@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BOT</title>
+</head>
+<body>
+    <h1>BOT</h1>
+    <main>
+        <h3>Message</h3>
+        {% for m in mes %}
+            <p>{{ m.text }}</p>
+        {% endfor %}
+    </main>
+    <script>
+        setInterval(function(){location.reload()}, 2000);
+    </script>
+</body>
+</html>
