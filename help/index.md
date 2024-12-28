@@ -11,5 +11,7 @@
 3. [Робота з наліпками](03-sticker/help.md)
 4. [Тестове заняття](04-test/help.md)
 5. [Робота з файлами](05-file/help.md)
-6. ...
+6. [Робота з Try-Except](06-file-try/help.md)
+7. [Робота з pythonanywhere](07-pythonanywhere/help.md)
+8. Тестове завдання
 
