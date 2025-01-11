@@ -1,104 +1,101 @@
 import telebot
 from telebot import types
 
-token = '7673939553:AAEET8kWs7QFanPR8YiZVHHQFuZNjdEjYo'
+token = '7391689885:AAGK7dR_-29yZpr3NHfqT8C3RG5srr8cbUM'
 bot = telebot.TeleBot(token)
 
+stickers = ['CAACAgIAAxkBAAO3Z0iqLLOSpaCz8_EVHM7uWxrxLD4AAgUAA8A2TxP5al-agmtNdTYE']
 
-@bot.message_handler(commands=['open'])
-def handler_open(message):
-    bot.send_message(message.chat.id, 'open the door')
-
-
-@bot.message_handler(commands=['close'])
-def handler_close(message):
-    bot.send_message(message.chat.id, 'close the door')
+# --- BOT MESSAGE ---------------------------------------------------
 
 
-@bot.message_handler(commands=['start', 'stop', 'speed'])
-def handler_run_car(message):
-    car = 'stand'
-    if message.text == '/start':
-        car = 'we start moving'
-    elif message.text == '/stop':
-        car = 'stop'
-    elif message.text == '/speed':
-        car = 'change speed'
-
-    bot.send_message(message.chat.id, car)
+# команда /start
+@bot.message_handler(commands=['start'])
+def command_start(message):
+    bot.send_message(message.chat.id, 'Команда СТАРТ!')
 
 
-@bot.message_handler(commands=['pizza'])
-def handler_pizza(message):
+# команда /stop
+@bot.message_handler(commands=['stop'])
+def command_stop(message):
+    bot.send_message(message.chat.id, 'Команда СТОП!')
+
+
+# кманди: /open, /close
+@bot.message_handler(commands=['open', 'close'])
+def commands_open_close(message):
+    mes = ''
+
+    if message.text == '/open':
+        mes = 'Відкрито'
+    elif message.text == 'close':
+        mes = 'Закрито'
+
+    bot.send_message(message.chat.id, mes)
+
+
+@bot.message_handler(commands=['key'])
+def key_go(message):
     keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
-    btn1 = types.KeyboardButton(text='Pepperoni')
-    btn2 = types.KeyboardButton(text='Cheesy')
-    keyboard.add(btn1, btn2)
+    button_1 = types.KeyboardButton(text='Кнопка 1')
+    button_2 = types.KeyboardButton(text='Кнопка 2')
+    keyboard.add(button_1, button_2)
 
-    mes = bot.send_message(message.chat.id, 'Choose a pizza', reply_markup=keyboard)
-    bot.register_next_step_handler(mes, pizza_order)
-
-
-@bot.message_handler(commands=['drink'])
-def handler_drinks(message):
-    keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
-    btn1 = types.KeyboardButton(text='Pepsi')
-    btn2 = types.KeyboardButton(text='Coca Cola')
-    btn3 = types.KeyboardButton(text='Fanta')
-    keyboard.add(btn1, btn2, btn3)
-
-    bot.send_message(message.chat.id, 'Choose a drinks', reply_markup=keyboard)
+    bot.send_message(message.chat.id, 'Клавіатура', reply_markup=keyboard)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Pepsi')
-def drinks_pepsi(message):
-    bot.send_message(message.chat.id, 'Reserved: ' + message.text)
+# Реакція на натискання кнопки
+@bot.message_handler(func=lambda message: message.text == 'Кнопка 1')
+def handle_button_1(message):
+    bot.send_message(message.chat.id, 'Ви натиснули кнопку 1.')
 
 
-@bot.message_handler(func=lambda message: message.text == 'Coca Cola')
-def drinks_cola(message):
-    bot.send_message(message.chat.id, 'Reserved: ' + message.text)
+@bot.message_handler(content_types=['sticker'])
+def handle_sticker(message):
+    sticker_id = message.sticker.file_id
+    emoji = message.sticker.emoji
+
+    bot.reply_to(message, f"Ви надіслали стікер з емоджі {emoji} (ID: {sticker_id})")
 
 
-@bot.message_handler(func=lambda message: message.text == 'Fanta')
-def drinks_fanta(message):
-    bot.send_message(message.chat.id, 'Reserved: ' + message.text)
-
-
-@bot.message_handler(commands=['ik'])
-def inline_keyboard(message):
-    keyboard = types.InlineKeyboardMarkup()
-    b1 = types.InlineKeyboardButton('button 1', callback_data='b1')
-    b2 = types.InlineKeyboardButton('button 2', callback_data='b2')
-    keyboard.add(b1, b2)
-
-    bot.send_message(message.chat.id, 'Choose: ', reply_markup=keyboard)
-
-
-@bot.callback_query_handler(func=lambda call: call.data == 'b1')
-def f_b1(cl):
-    if cl.data == 'b1':
-        bot.send_message(cl.message.chat.id, 'Right choice 1')
-    elif cl.data == 'b2':
-        bot.send_message(cl.message.chat.id, 'Right choice 2')
-
+# --- Текстові повідомлення ---
 
 @bot.message_handler(content_types=['text'])
-def test_text(message):
-    print(message)
+def bot_message(message):
 
-    msg = message.text + ' - this is a text message'
-    bot.send_message(message.chat.id, msg)
+    if message.text == '1':
+        bot.send_sticker(message.chat.id, stickers[0])
+        return True
+
+    mes = message.text + ' - Це просто текст'
+    bot.send_message(message.chat.id, mes)
 
 
-def pizza_order(message):
-    if message.text == 'Pepperoni':
-        pn = 123435
-    elif message.text == 'Cheesy':
-        pn = 1223434
+# --- Функції -------------------------------------------------------
 
-    bot.send_message(message.chat.id, f'Your pizza order: "{message.text}" has been placed! №')
+# Додаємо кнопки
+def bot_buttons(message):
+    keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+    button_1 = types.KeyboardButton(text='Кнопка 1')
+    button_2 = types.KeyboardButton(text='Кнопка 2')
+    button_3 = types.KeyboardButton(text='Кнопка 3')
+    button_4 = types.KeyboardButton(text='Кнопка 4')
+    keyboard.add(button_1, button_2, button_3, button_4)
+
+    msg = bot.send_message(message.chat.id, message.text, reply_markup=keyboard)
+    bot.register_next_step_handler(msg, button_if)
+
+
+def button_if(message):
+    if message.text == 'Кнопка 1':
+
+        # ... запустити програму ...
+        bot.send_message(message.chat.id, '1. Закопати путіна')
+    elif message.text == 'Кнопка 2':
+        bot.send_message(message.chat.id, '2. Закопати шойгу')
+    else:
+        bot.send_message(message.chat.id, '3,4. запустити русоріз')
 
 
 if __name__ == '__main__':
-    bot.infinity_polling()
+    bot.polling()
