@@ -41,8 +41,29 @@ def get_bd_cursor():
 
 def send_text_message():
     while True:
-        bot.send_message(1793322776, 'something worked')
-        time.sleep(10)
+        notes_id_list = []
+        print("send_text_message")
+        with get_bd_cursor() as cur:
+            cur.execute("""
+                SELECT users.chat_id, notes.title, notes.content, notes.notification, notes.id
+                FROM notes
+                INNER JOIN users ON notes.user_id = users.id
+                WHERE notes.is_send = 0 AND notes.deleted = 0 AND notes.notification < datetime('now')         
+            """)
+            rows = cur.fetchall()
+            print(rows)
+
+            for r in rows:
+                notes_id_list.append(r[4])
+                message = "Нагадування!\n" + r[3] + '\n' + r[1] + '\n' + r[2]
+                bot.send_message(r[0], message)
+                time.sleep(1)
+
+
+            id_str = ", ".join(['?'] * len(notes_id_list))
+            cur.execute(f"UPDATE notes SET is_send = 1 WHERE id IN ({id_str})", notes_id_list)
+
+        time.sleep(60)
 
 
 def bot_start(message):
@@ -168,7 +189,7 @@ def save_notification_note(message, note_id):
         notification = original_date.strftime("%Y-%m-%d %H:%M:00")
 
         with get_bd_cursor() as cur:
-            cur.execute(f"UPDATE notes SET notification=? WHERE id=?", (notification, note_id))
+            cur.execute(f"UPDATE notes SET is_send = 0, notification=? WHERE id=?", (notification, note_id))
 
             if cur.rowcount > 0:
                 bot.send_message(message.chat.id, 'Час оновлено!')
@@ -182,8 +203,6 @@ def save_notification_note(message, note_id):
 
 # start - підписатися
 # add - додати
-# edit - редагувати
-# del - видалити
 # all - показати усі нотатки
 # help - вивести підказки
 # end - відписатися
@@ -223,6 +242,7 @@ def text_massage(message):
     bot.send_message(message.chat.id, 'Working!')
 
 if __name__ == '__main__':
-    # thread = threading.Thread(target=send_text_message)
-    # thread.start()
+    thread = threading.Thread(target=send_text_message)
+    thread.start()
+
     bot.infinity_polling()
